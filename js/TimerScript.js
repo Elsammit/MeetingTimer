@@ -5,11 +5,11 @@ reset_form();
 リセットボタン押下時の実行.
 */
 function reset_form(){
-    if(sw_status == 1){
-        start_count();
+    if(sw_status == 1){	// タイマスタート中の場合.
+        start_count();	// タイマ停止のための処理実行.
     }
-    timer = 0;
-    money = 0;
+    timer = 0;			// タイマ初期化.
+    money = 0;			// 金額の初期化.
     result_Message();
     document.form_sw.counter.value=count_format(0); // タイマのクリア.
     document.form_sw.Meeting_Money.value=0;         // 発生金額のクリア.
@@ -32,8 +32,10 @@ function calc_money(){
 時給を秒毎に発生する給料に変換.
 */
 function calc_sec_salary(salary){
-    var buf = (10000/8)/20;
-    var tsalary = (salary/60)/60 * buf;
+	var work_hour = 8;								// 1日の労働時間(8時間で設定).
+	var workday_ofmonth = 20;						// 月の労働日数(20日で設定).
+    var buf = (10000/work_hour)/workday_ofmonth;	// 月給を秒毎の給料に変換するための計算(1)
+    var tsalary = (salary/60)/60 * buf;				// 月給を秒毎の給料に変換するための計算(2)
     return tsalary;
 }
 
@@ -56,19 +58,17 @@ function result_Message(){
 スタート(ストップ)ボタン押下時の処理.
 */
 function start_count(){
-    if(sw_status == 0){
-        result_Message();
-        money = calc_money();
-        document.form_sw.start.value = "ストップ";
-        document.getElementById("resultID").innerText = "";
-        sw_status = 1;
-        timerID = setInterval("count_up()",1000);
-    }else{
+    if(sw_status == 0){										// タイマー未スタートの時にボタン押下した時.
+        result_Message();									// メッセージの初期化.
+        money = calc_money();								// 入力された月給や人数から1秒毎に発生する会議費用を算出.
+        document.form_sw.start.value = "ストップ";			
+        sw_status = 1;										// ステータスをタイマースタート中に変更.
+        timerID = setInterval("count_up()",1000);			// 1秒毎にcount_up()関数実行.
+    }else{													// タイマースタート中の時にボタン押下した時.
         result_Message();
         document.form_sw.start.value = "スタート";
-        resultID
-        sw_status = 0;
-        clearInterval(timerID);
+        sw_status = 0;										// ステータスをタイマー未スタートに変更.
+        clearInterval(timerID);								// 定期的に実行していたcount_up()の実行を停止.
     }
 }
 
@@ -76,20 +76,20 @@ function start_count(){
 1秒カウントアップした際の処理.
 */
 function count_up(){
-    timer++;
-    document.form_sw.counter.value = count_format(timer);
-    document.form_sw.Meeting_Money.value = Math.floor(money * timer);
+    timer++;														
+    document.form_sw.counter.value = count_format(timer);				// カウントアップした結果をテキストに表示.
+    document.form_sw.Meeting_Money.value = Math.floor(money * timer);	// moneyを乗算し金額を算出.
 }
 
 /*
 タイマー表示のフォーマットを時分秒に変換するための処理.
 */
 function count_format(num){
-    var ts = num % 60;
-    var tm = Math.floor(num /60);
-    var th = Math.floor(tm/60);
-    tm = tm % 60;
-    return check_digit(th) + ":" + check_digit(tm) + ":" + check_digit(ts);
+    var ts = num % 60;				// 秒変換.
+    var tm = Math.floor(num /60);	
+    var th = Math.floor(tm/60);		// 時変換.
+    tm = tm % 60;					// 分変換.
+    return check_digit(th) + ":" + check_digit(tm) + ":" + check_digit(ts);	// フォーマット変換後、00:00:00のフォーマットで出力.
 }
 
 /*
