@@ -54,6 +54,33 @@ function result_Message(){
     }
 }
 
+function sendToServer(){
+    var send_money = document.form_sw.Meeting_Money.value;
+    return $.ajax({
+        url:"http://192.168.56.2:3000/SendMoney",//phpファイルのURL
+        type: "post",
+        data: {"money":send_money,
+                "Manager_num":document.form_salary.Manager_Num.value,
+                "GL_num":document.form_salary.GL_Num.value,
+                "Chief_num":document.form_salary.Chief_Num.value,
+                "Employee_num":document.form_salary.Employee_Num.value,
+                "Manager_salary":document.form_salary.Manager_salary.value,
+                "GL_salary":document.form_salary.GL_salary.value,
+                "Chief_salary":document.form_salary.Chief_salary.value,
+                "Employee_salary":document.form_salary.Employee_salary.value,
+                "Meeting_time":document.form_sw.counter.value,
+                "Meeting_Name":document.form_sw.Meeting_Name.value
+            },	
+        dataType: 'text',
+        success: function(){	// 転送成功時.
+            console.log("success");	
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {	// 転送失敗時.
+            console.log("error");
+        }
+    })
+}
+
 /*
 スタート(ストップ)ボタン押下時の処理.
 */
@@ -66,6 +93,7 @@ function start_count(){
         timerID = setInterval("count_up()",1000);			// 1秒毎にcount_up()関数実行.
     }else{													// タイマースタート中の時にボタン押下した時.
         result_Message();
+        sendToServer();
         document.form_sw.start.value = "スタート";
         sw_status = 0;										// ステータスをタイマー未スタートに変更.
         clearInterval(timerID);								// 定期的に実行していたcount_up()の実行を停止.
@@ -101,4 +129,7 @@ function check_digit(num){
         ret = "0" + num;
     }
     return ret;
+}
+function show_result(){
+    document.location.href = "http://192.168.56.2:3000/result";
 }
